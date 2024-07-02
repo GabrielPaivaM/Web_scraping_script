@@ -1,0 +1,19 @@
+Instruções:
+
+Se é a primeira vez utilizando o script, certifique-se de ter o Python instalado. Em seguida, utilize o comando a seguir para instalar as dependências necessárias:
+
+    pip install requests bs4 colorama
+
+Códigos:
+
+    python create_update_all.py
+
+- Este script cadastra e atualiza todos os registros de pesquisas em um arquivo .csv. Se o arquivo .csv não existir, ele será criado automaticamente.
+
+    python update_new.py
+
+- Este script cadastra no arquivo .csv todas as pesquisas que ainda não estão cadastradas, atualizando-o com novas pesquisas.
+
+    python print_data.py
+
+- Este script exibe no console o título das 5 primeiras pesquisas cadastradas e os títulos das 5 últimas pesquisas, junto com o total de pesquisas cadastradas.
