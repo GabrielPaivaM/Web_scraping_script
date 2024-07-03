@@ -22,7 +22,7 @@ Este script Python extrai dados do Portal ISSN de registros de pesquisas em vár
 1. Clone o repositório para o seu ambiente local:
 
    ```bash
-   git clone https://github.com/seu-usuario/issn-portal-data-scraper.git
+   git clone https://github.com/GabrielPaivaM/issn-portal-data-scraper.git
    cd issn-portal-data-scraper
    ```
 
