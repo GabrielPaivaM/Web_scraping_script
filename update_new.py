@@ -6,13 +6,16 @@ import csv
 
 from colorama import Fore, Style, init
 
-# Verifica se o registro ja existe no arquivo.
-def verify_if_exist_a_register(title, registers):
+def verify_if_exist_a_register(issn, registers):
     for register in registers:
-        if title in register:
-            return True
-    return False
+        # Transforma a tupla em uma única string concatenando todos os seus elementos
+        register_str = ",".join(map(str, register))
 
+        # Verifica se o título está na string do registro
+        if issn in register_str:
+            return True
+
+    return False
 
 url = 'https://portal.issn.org/api/search/?q=api%2Fsearch&search%5B0%5D=MUST%3Dcountry%3DAIA%2CATG%2CARG%2CABW%2CBHS%2CBRB%2CBLZ%2CBOL%2CBES%2CBRA%2CCYM%2CCHL%2CCOL%2CCRI%2CCUB%2CCUW%2CDMA%2CDOM%2CECU%2CSLV%2CGNQ%2CGUF%2CGRD%2CGLP%2CGTM%2CGUY%2CHTI%2CHND%2CJAM%2CMTQ%2CMEX%2CMSR%2CNIC%2CPAN%2CPRY%2CPER%2CPRI%2CMAF%2CVCT%2CSUR%2CTTO%2CURY%2CVEN&search%5B1%5D=MUST%3Drecord%3DRegister&search%5B2%5D=MUST_EXIST%3Droadindex&role%5B0%5D=11&search_id=38321820&size=100&currentpage=1'
 
@@ -62,47 +65,54 @@ for i in range(1, int(number_of_last_page) + 1):
 
                 title = article.find('h5', class_="item-result-title").get_text().strip()
 
+                print(f'{Fore.LIGHTCYAN_EX}{title}')
+
                 if not title:
                     title = "Titulo não informado"
 
 
-                # Se não existe no arquivo ele vai registrar, se ja existe vai retornar qur ja foi registrado.
-                if not verify_if_exist_a_register(title, registers):
+                # Lista para armazenar os textos dos parágrafos.
+                paragraph_texts = []
 
-                    # Lista para armazenar os textos dos parágrafos.
-                    paragraph_texts = []
+                content_divs = article.find_all('div', class_="item-result-content-text flex-zero")
 
-                    content_divs = article.find_all('div', class_="item-result-content-text flex-zero")
+                for content_div in content_divs:
+                    paragraphs = content_div.find_all('p')
 
-                    for content_div in content_divs:
-                        paragraphs = content_div.find_all('p')
-
-                        for p in paragraphs:
-                            if 'text-center hidden-tablet selectMobile' not in p.get('class', []) and p.find('label', class_="btn btn-item-select") is None:
-
-                                # Verifica se há um link no paragrafo.
-                                link = p.find('a')
-                                if link and 'href' in link.attrs:
-                                    url_complete = link['href'].strip()
-                                    if not url_complete:
-                                        paragraph_texts.append('Não informado')
-                                    else:
-                                        paragraph_texts.append(f'URL:{url_complete}')
+                    for p in paragraphs:
+                        if 'text-center hidden-tablet selectMobile' not in p.get('class', []) and p.find('label',
+                                                                                                         class_="btn btn-item-select") is None:
+                            # Verifica se há um link no paragrafo.
+                            link = p.find('a')
+                            if link and 'href' in link.attrs:
+                                url_complete = link['href'].strip()
+                                if not url_complete:
+                                    paragraph_texts.append('Não informado')
                                 else:
-                                    paragraph_text = p.get_text(strip=True)
-                                    if not paragraph_text:
-                                        paragraph_text = "Não informado"
-                                    paragraph_texts.append(paragraph_text)
+                                    paragraph_texts.append(f'URL:{url_complete}')
+                            else:
+                                paragraph_text = p.get_text(strip=True)
+                                if not paragraph_text:
+                                    paragraph_text = "Não informado"
+                                paragraph_texts.append(paragraph_text)
 
-                        line = "Title: " + title + ";"
-                        for text in paragraph_texts:
-                            line += " " + text + ";"
-                        line += "\n"
+                if paragraph_texts:
+                    issn_to_check = paragraph_texts[0]
+                else:
+                    issn_to_check = "Não informado"
 
-                        elapsed_time = time.time() - start_time
+                # Se não existe no arquivo ele vai registrar, se ja existe vai retornar qur ja foi registrado.
+                if not verify_if_exist_a_register(issn_to_check, registers):
+                    line = "Title: " + title + ";"
+                    for text in paragraph_texts:
+                        line += " " + text + ";"
+                    line += "\n"
 
-                        f.write(line)
-                        print(f'{Fore.LIGHTGREEN_EX}Pesquisa {c} registrada com sucesso em {Fore.LIGHTWHITE_EX}{elapsed_time:.3f}{Fore.LIGHTGREEN_EX} segundos.\n')
+                    elapsed_time = time.time() - start_time
+
+                    f.write(line)
+                    print(
+                        f'{Fore.LIGHTGREEN_EX}Pesquisa {c} registrada com sucesso em {Fore.LIGHTWHITE_EX}{elapsed_time:.3f}{Fore.LIGHTGREEN_EX} segundos.\n')
                 else:
                     print(f'{Fore.LIGHTCYAN_EX}Pesquisa {c} ja registrada.\n')
 

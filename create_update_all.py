@@ -37,6 +37,11 @@ c = 1
 with open('cnpq_data_portal_issn.csv', 'w', newline='', encoding='UTF-8') as f:
 
     for i in range(1, int(number_of_last_page) + 1):
+
+    # User esse for para salvar somente a primeira pagina para testar o outro script de atualizar com os que estão faltando.
+    # for i in range(1, 2):
+
+
         start_time_page = time.time()
         url_page = f'https://portal.issn.org/api/search/?q=api%2Fsearch&search%5B0%5D=MUST%3Dcountry%3DAIA%2CATG%2CARG%2CABW%2CBHS%2CBRB%2CBLZ%2CBOL%2CBES%2CBRA%2CCYM%2CCHL%2CCOL%2CCRI%2CCUB%2CCUW%2CDMA%2CDOM%2CECU%2CSLV%2CGNQ%2CGUF%2CGRD%2CGLP%2CGTM%2CGUY%2CHTI%2CHND%2CJAM%2CMTQ%2CMEX%2CMSR%2CNIC%2CPAN%2CPRY%2CPER%2CPRI%2CMAF%2CVCT%2CSUR%2CTTO%2CURY%2CVEN&search%5B1%5D=MUST%3Drecord%3DRegister&search%5B2%5D=MUST_EXIST%3Droadindex&role%5B0%5D=11&search_id=38321820&size=100&currentpage={i}'
         site = requests.get(url_page, headers=headers)
